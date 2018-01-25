@@ -1,0 +1,2 @@
+qsub -l nodes=4:ppn=20,walltime=192:00:00 run_CM1_test -q dchavas
+

@@ -1,0 +1,38 @@
+#!/bin/csh
+
+cd $PBS_O_WORKDIR
+echo "START RUN_CM1"
+
+set geometry = 3D
+set numproctotal = 80
+
+#Add modules for Intel compiler, NetCDF, OpenMPI
+module load intel/16.0.1.150
+module load impi/5.1.2.150
+module load netcdf4/4.3.2
+
+############################################################################
+## RUN MODEL
+
+#Run model
+
+if (${geometry} == 3D) then
+
+##MPI (multi-node)
+mpiexec -n ${numproctotal} ./cm1.exe
+
+else if (${geometry} == ax) then
+
+##OpenMP (single node)
+setenv OMP_NUM_THREADS ${numproctotal}
+./cm1.exe
+
+else
+
+echo 'Geometry entry makes no sense'
+stop
+exit
+
+endif
+
+
