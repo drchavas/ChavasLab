@@ -1,0 +1,87 @@
+%Holland_1980.m
+
+%Purpose: plot the Holland (1980) wind model
+%Created: 2010-09-24, Dan Chavas
+
+
+clear
+clc
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%
+%params
+B = .9:.1:1.9; %1.2; %.9:.01:1.9;    %[non-dim], (.9,1.9); "Holland B parameter" = peakedness of pressure profile
+RMW = 50; %10:10:100; %10:1:100;   %[km]; radius of maximum winds
+dp = 100*100;   %[Pa] p-p_ref; p_ref = 1020 hPa
+rho_air = 1.15;    %[kg m^-3]; density of air
+omega = 7.292e-5;   %[s-1]; Earth rotation rate
+lat = 20;   %[deg]; latitude
+
+%radii
+dr=1;   %[km]; radial increments
+r_max=800;  %[km]
+r=[1:dr:r_max]; %[km]
+
+%plotting
+plot_profile=0;
+plot_IKE=1;
+
+%%%%%%%%%%%%%%%%%%
+
+for i=1:length(B)   %rows
+    for j=1:length(RMW) %columns
+
+        %calculate variables as needed
+        f=2*omega*sind(lat);
+        x=(r./RMW(j)).^B(i);  %non-dim
+        c=B(i)*dp/rho_air; %[ms-1]
+        r=r*1000;   %[km]-->[m]
+
+        %radial wind profile: cyclostrophic balance
+        %V = sqrt(c*x.*exp(-x)); %[ms-1]; radial wind profile
+
+        %check V_max with analytical value
+        %C=sqrt(B(i)/(rho_air*exp(1)));
+        %V_max_centrifugal = C*sqrt(dp)
+
+        %radial wind profile: gradient wind balance
+        V = sqrt(c*x.*exp(-x) + .25*r.^2.*f^2)-.5*r.*f; %[ms-1]; radial wind profile
+
+        %rescale
+        r=r/1000;   %[m]-->[km]
+
+        %estimate of integrated kinetic energy (IKE)
+        IKE(i,j) = sum((V.^2)*dr);
+        
+%plot things
+if(plot_profile==1)
+    figure(1)
+    hold on
+    %subplot(2,1,1)
+    %plot(r,x)
+    %plot(r,r/50,'g--')
+    %subplot(2,1,2)
+    plot(r,V,'g')
+    xlabel('radius [km]')
+    ylabel('wind speed [ms-1]')
+    title('radial wind profile')
+    axis([0 r_max 0 70])
+
+    %hold off
+end
+        
+    end
+end
+
+if(plot_IKE==1)
+    IKE_mean=mean(mean(IKE));
+    IKE=IKE./IKE_mean;
+    imagesc(RMW,B,IKE)
+    xlabel('RMW [km]')
+    ylabel('Holland B parameter')
+    title('IKE/mean(IKE)')
+    colorbar
+end
+
+
+    %}
