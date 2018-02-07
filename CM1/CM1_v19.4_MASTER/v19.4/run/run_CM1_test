@@ -7,6 +7,7 @@ set geometry = 3D
 set numproctotal = 80
 
 #Add modules for Intel compiler, NetCDF, OpenMPI
+module purge
 module load intel/16.0.1.150
 module load impi/5.1.2.150
 module load netcdf4/4.3.2
