@@ -1,0 +1,7 @@
+To upload the code to the repository
+From ~/ChavasLab on halstead:
+
+git add .
+git commit -m "Upload ..."
+git status
+git push
